@@ -142,7 +142,7 @@
  <body>
      
      <div id="side-panel">
-     <h1>University of Kentucky's Reported Crimes</h1>
+     <h1>Reported Crimes at the University of Kentucky</h1>
      <h2>2013 to 2016 Analysis of Crime Across the University of Kentucky</h2>
      <p>This map is a study of all reported criminal offenses that occurred on the University of Kentucky's campus.  The map will also convert to a heat map by selecting the button in the upper right hand corner. Simply click again to turn off the heat map.</p> 
      <p>This map was authored by Logan Steele for MAP 673. This map was created on June 12, 2016. The data for this map was gathered from an open source that is available to the public found at <a href="http://www.uky.edu/crimelog/">University of Kentucky's Police Department Crime Log</a>. </p>
@@ -258,7 +258,7 @@
          });
          point.eachLayer(function(layer) {
              
-             if (String(layer.feature.properties.month) !== Number(attribute)) {
+             if (String(layer.feature.properties.month) !== attribute) {
                  tempRemoved.addLayer(layer);
                  map.removeLayer(layer);
              }
