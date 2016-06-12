@@ -1,7 +1,7 @@
  <html>
  <head>
      <meta charset="utf-8">
-     <title>University of Kentucky Crimes</title>
+     <title>Module 08 Project</title>
      
      <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
      <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
@@ -142,7 +142,7 @@
  <body>
      
      <div id="side-panel">
-     <h1>University of Kentucky's Reported Crimes</h1>
+     <h1>University of Kentucky's Reported Thefts</h1>
      <h2>2013 to 2016 Analysis of Thefts across the University of Kentucky</h2>
      <p>This map is a study of all reported criminal offenses that occurred on the University of Kentucky's campus. The following list is a list of offenses you can enter into the search bar and see how they compare across campus. The map will also convert to a heat map by selecting the button in the upper right hand corner. Simply click again to turn off the heat map</p> 
      <p>This map was authored by Logan Steele for MAP 673. This map was created on June 5, 2016. The data for this map was gathered from an open source that is available to the public found at <a href="http://www.uky.edu/crimelog/">University of Kentucky's Police Department Crime Log</a>. </p>
@@ -191,7 +191,7 @@
      var offense = String(prompt("Theft, Robbery, Drug Violations, Alcohol Intoxication, Criminal Mischief, DUI, Harassment, Burglary, Assault, All Other Offenses", "Enter the offense you would like to see"));
      
      
-     $.getJSON('https://lsteele.cartodb.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM full_crime_log_1', function(data) {
+     $.getJSON('https://lsteele.cartodb.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM crimes2_1', function(data) {
          
  
          point = L.geoJson(data, {
@@ -258,7 +258,7 @@
          });
          point.eachLayer(function(layer) {
              
-             if (String(layer.feature.properties.month) !== attribute) {
+             if (String(layer.feature.properties.month) !== String(attribute)) {
                  tempRemoved.addLayer(layer);
                  map.removeLayer(layer);
              }
@@ -267,7 +267,6 @@
      
          
 
-<<<<<<< HEAD
     function createSliderUI(data) {
         
         var slider = $('.year-slider');
@@ -351,115 +350,3 @@
  </script>
  </body>
  </html> 
-=======
-<style>
-    
-    header {
-        width: 100%;
-        min-width: 800px;
-        margin: 0 auto;
-        background: #34675C;
-        padding: 15px 0 20px;
-       }
-    h1 {
-        font-family: 'Oswald', sans-serif;
-        color: #B3C100;
-        width: 80%;
-        margin: 0 auto;
-        color: #B3C100;
-    }
-    h2 {
-        font-family: 'Oswald', sans-serif;
-        color: #B3C100;
-        width: 80%;
-        margin: 0 auto;
-        color: #B3C100;
-    }
-    h3 {
-        font-family: 'Oswald', sans-serif;
-        color:  #34675C;
-    }
-    p {
-        font-size: .9em;
-        color:  #34675C;
-    }
-    ul {
-        list-style-type: none;
-        font-size: .9em;
-        color:  #34675C;
-        line-height: 1.6em;
-    }
-    a, a:visited {
-        color: #003d71;
-    }
-    
-    body {
-        background: #E2DFA2;
-        font-family: sans-serif;
-    }
-    .project {
-        width: 80%;
-        min-width: 800px;
-        height: 100%;
-        margin: 35px auto;
-    }
-    .project:after{
-        content: "";
-        display: table;
-        clear: both;
-    }
-    .project-image {
-        width: 388px;
-        height: 240px;
-        background: white;
-        float: left;
-        margin-right: 20px;
-        border: 2px solid #dddddd;
-    }
-
-</style>
-</head>
-
-<body>
-    <header>
-    <h1>Mapping Projects on the National Level</h1>
-    <h2>Logan Steele's Web Portfolio for MAP 672</h2>
-    </header>
-
-   <section class="project">
-       <a target = '_blank' href="/lesson-10-graphics/breweries-us.png"><img src="/images/breweries.PNG" alt="Breweries Across the U.S." class="project-image" /> </a>
-    <h3>Breweries Across the U.S.</h3>
-    <p>This map was created while taking MAP 671: Introduction to New Mapping at the University of Kentucky. It shows a collection of points called hexbins. Hexbins are a set polygon that counts all of the points within that area to gather a sum. Tha sum is represented with a color, and that color is categorized into 5 levels for this particular map. For this map, the hexbins were set to 50 km diameters.  </p>
-    <p>This map was created in QGIS by taking in .csv data provided by the professor, which they received from the listed source. This .csv data was converted into point data and then created new polygon shapefiles, the hexbins, that will be used to count data points within each hexbin. </p>
-    <ul>
-        <li>See Map: <a href="/lesson-10-graphics/breweries-us.png"> Hexbin Map of Breweries with the United States</a></li>
-        <li>Data Source: <a href="http://www.poi-factory.com">The POI Factory. CSV data file: poifactory-breweries.csv   </a></li>
-    </ul>
-</section>
-    
-<section class="project">
-    <a target = '_blank' href="https://lsteele.cartodb.com/viz/b631504e-924b-11e5-9869-0ecd1babdde5/public_map"><img src= "/images/cancer-rates-us.PNG" alt= "Cancer Rates in the U.S. by Counties" class="project-image" /> </a>
-    <h3>Cancer Rates in the U.S. by Counties</h3>
-    <p>This map was also created within MAP 671; however, it was developed further along in the class. This map was created in coordination with QGIS and CartoDB. This unique coordination allowed early students to create online and interactive maps. </p>
-    <p>Data for this map was retrieved from the State Cancer Profiles website, and downloaded onto our local machines. From this point, we normalized the data and created a map within QGIS. We were able to upload that data and intergrate it with CartoDB. We were able to add additional controls for making an interactive map within CartoDB.</p>
-    <ul>
-        <li>See the map: <a target = '_blank' href="https://lsteele.cartodb.com/viz/b631504e-924b-11e5-9869-0ecd1babdde5/public_map"> Cancer Rates in the U.S. by Counties </a></li>
-        <li>Data Source: <a target = '_blank' href="http://www.statecancerprofiles.cancer.gov/"> State Cancer Profiles </a></li>
-    </ul>
-</section>
-    
-<section class="project">
-    <a target = '_blank' href="http://ltst226.github.io/"> <img src="/images/energy.PNG" alt="Power Plants Across the U.S." class="project-image"/> </a>
-    <h3>Power Plants Across the U.S.</h3>
-    <p>This map was created in MAP 672: Programming for Web Mapping. This course was developed to help students in an introduction for web programming and javascript coding. These programs were written within a program called Brackets which was used alongside Github to store and present the data and maps. The final project of this class is the web portfolio you are reading now.</p>
-    <p>This proportional symbol map was created with data gathered from the Energy Information Administration. The point data gathered from the EIA was stored in a file and was added to the programming we wrote. We were then able to take that point data, change it, style it, and make the map interactive. </p>
-    <ul>
-        <li>See the map: <a target = '_blank' href="http://ltst226.github.io/"> Power Plants Across the U.S.</a></li>
-        <li>Data Source: <a target = '_blank' href="http://www.eia.gov/electricity/data/eia923/"> Energy Information Administration</a></li>
-    </ul>
-
-</section>
-    
-</body>
-</html>
->>>>>>> parent of 5f8a90d... update github map
