@@ -258,7 +258,7 @@
          });
          point.eachLayer(function(layer) {
              
-             if (String(layer.feature.properties.month) !== String(attribute)) {
+             if (String(layer.feature.properties.month) !== Number(attribute)) {
                  tempRemoved.addLayer(layer);
                  map.removeLayer(layer);
              }
