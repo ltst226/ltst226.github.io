@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <meta charset=utf-8 />
+    <title>Lab 03 Homework file</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/1.0.0/simple_statistics.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            position: absolute;
+            z-index: 100;
+            top: 10px;
+            left: 60px;
+            padding: 8px 15px;
+            margin: 0; 
+            color: whitesmoke;
+            font-size: 1.5em;
+            background: rgba(25,25,25,0.80);
+            border-radius: 5px;
+        }
+        #map {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: #001323;
+        }
+         .legend {
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(75,75,75,0.8);
+            color: whitesmoke;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            width: 160px;
+        }
+        .legend h3 {
+            font-size: 1.1em;
+            font-weight: bold;
+            line-height: 1em;
+            color: whitesmoke;
+            margin: 0;
+        }
+        .legend li {
+            list-style-type: none;
+            height: 22px;
+        }
+        .legend span {
+            width: 30px;
+            height: 20px;
+            float: left;
+            margin-right: 10px;
+        }
+        .legend label {
+            font-size: 1.1em;
+        }
+        .legend label:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+        #ui-controls {
+            width: 176px;
+            padding: 8px, 15px, 8px, 15px;
+            background: rgba(75,75,75,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            color: whitesmoke;
+        }
+        #ui-controls .min {
+            float: left;   
+        }
+        #ui-controls .max {
+            float: right;
+        }
+        .year-slider {
+            width: 100%;
+        }
+        label {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .info {
+            padding: 6px 8px;
+            font-size: 1em;
+            background: hsla(120, 100%, 25%, 0.95);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            text-align: left; 
+        }
+        .info h3 {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Ohio Counties' Unemployment Rates from 2005 to 2013</h1>
+    <div id='map'></div> <!--create ID map-->
+    <div id='ui-controls'> <!--create ID ui controls and give spefications and class options.-->
+        <label><span class="min">2005</span><span class="max">2013</span><input type='range' min='2005' max= '2013' value= '2001' step= 1 class= 'year-slider'></input></label>
+    </div>
+    
+    <script>
+        
+        var options = {
+            center: [40.06, -83.5],
+            zoom: 7,
+            minZoom: 4,
+            maxZoom: 13,
+            dragging: true,
+            zoomControl: true
+        }
+        // options for the view of the map
+        var map = L.map('map', options);
+        // creates variable of map and sets the viewing options with this map
+        
+        var Stamen_TonerBackground = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}.{ext}', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+	           subdomains: 'abcd',
+	           minZoom: 0,
+	           maxZoom: 20,
+	           ext: 'png'
+        }).addTo(map);
+        
+    //selection of tile used on this map and loaded to map
+                
+        var dataLayer,
+            attribute = 2005;
+        //Two global variables that will be used throughout the script 
+        
+        $.getJSON("ohio_cou.json", function(counties) { //retrieved and loaded the GeoJson file for the state of ohio to the script
+            
+            
+            Papa.parse('ohio_unemployment_rates.csv', { //retrieved and loaded the csv file that contains the data for unemployment rates.
+                
+                download: true, //option to download the data
+                header: true, //option to keep the first line in the csv as a header to keep data organized
+                complete: function(data) { //when complete, it calls the function below. 
+                    
+                    processData(counties, data); //function call that passes counties and data as parameters
+                }
+            });
+            
+        });
+ 
+        function processData(counties, data) { //funciton processData passes counties and data as parameters. This function will loop data within both files until a column and it's contents match up. At that point, it will stop the loop. 
+            
+            
+            for (var county in counties.features) { //outer loop will use the geoJson file to loop through.
+            
+                var props = counties.features[county].properties;
+            
+                for(var d in data.data) { //inner loop will use the csv file to find the match with the outer loop. 
+                  
+                    if(props.NAME === data.data[d].County) {
+                        counties.features[county].properties = data.data[d]; //once the name of the counties match up, the loops will break
+                        break;
+                        }  
+                    }
+                }
+            drawLegend(); //function call to draw the legend
+            
+            drawMap(counties); //function call to draw the map with counties as a parameter
+            
+            drawInfo(); //function call to draw the Info box
+            
+            createSliderUI(); //function call to draw the slider option 
+        
+        }
+        
+            
+        function drawMap(counties) { //function draws the map with the counties used as a parameter
+            
+            dataLayer = L.geoJson(counties, { //uses global variable dataLayer and sets the features for the map
+                style: function(feature){
+                    return {
+                        color: '#000',
+                        weight: 1,
+                        fillOpacity: 1,
+                        fillColor: 'pink'
+                    }
+                }
+            }).addTo(map); //adds the styels and counties to the map
+            
+            updateMap(); //function call to update the map to create the choropleth map
+            
+        }
+        
+        function updateMap() { //function updateMap will pass all the code to create the color classes and create popups
+            
+            var breaks = getClassBreaks(); //sets variable breaks to call a function getClassBreaks
+            
+            
+            dataLayer.eachLayer(function(layer) {
+                layer.setStyle({
+                   fillColor: getColor(Number(layer.feature.properties[attribute]), breaks) 
+                }); //sets the fillColor of the map to be retrieved from the function getColor, changes the data rate to a number that will be placed into the correct color class. 
+                
+                var props = layer.feature.properties //sets props to equal layer.feature.properties. This will shorten the code in the popup
+                
+                layer.bindPopup("<b>"+ props.County + " County" + "</b><br>"
+                                +"<b>" + "Unemployment Rate " + props[attribute] + " %" + "</b>"); //creates popup and gives code to show the name of the county, and the unemployment rate
+                layer.on('mouseover', function() { //creates a listen event for when the mouse hovers over a county
+                    highlight(layer); //calls function to highlight the county when hovered over
+                    updateInfo(layer); //function call to update the info box with that county's information
+                    $(".info").show(); //shows the info box and all of the county's data
+                });
+                layer.on('mouseout', function() { //creates listen event for when the mouse moves out of that county, it will hide that county's information
+                    $(".info").hide(); //hide the info box
+                    resetHighlight(layer); //resets the highlight to the orignal county's outline color
+                });
+                
+            });
+            
+            updateLegend(breaks); //function call to update the legend and passes the breaks as the parameter
+            
+        }
+        
+        function getClassBreaks() { //function getClassBreaks will use simple statistics to create 5 class breaks, and creates an array of all values within each class
+            var values = []; //empty array that will filled with the pushed values for each class
+            
+            dataLayer.eachLayer(function(layer) {
+                var value = Number(layer.feature.properties[attribute]);
+                values.push(value);
+            }); //for each layer, the unemployment rate is retrieved, and then pushed into the array.
+            var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]); //simple statistics is used to break the values evenly through 5 classes
+            return breaks; //returns the breaks
+        }
+        
+        
+        function getColor(d, breaks) { //function getColor will classify what class break will be what color. 
+            
+            if(d <= breaks[1]) {
+                return '#ffffcc';
+            } else if(d <= breaks[2]) {
+                return '#c2e699';
+            } else if(d <= breaks[3]) {
+                return '#78c679';
+            } else if(d <= breaks[4]) {
+                return '#31a354'
+            } else if(d <= breaks[5]) {
+                return '#006837'
+            }
+            
+        }
+            
+        function drawLegend() { //function to draw the legend
+            
+            var legend = L.control({position: 'topleft'}); //creates the legend and places it in the topleft corner
+            legend.onAdd = function () {
+                
+                var div = L.DomUtil.create('div', 'legend'); //creates the div portion of the legend and sets the class id for css rules
+               
+                return div;
+                
+                    
+            };
+            legend.addTo(map); //adds the legend to the map
+            
+        }
+        
+        function updateLegend(breaks) { //function takes in the breaks and updates the legend
+            
+             var legend = $('.legend'); //variable legend equals jQuery call for legend
+            
+             legend.html("<h3>% Unemployment " + attribute + "</h3><ul>");  //sets html rules for the legend title
+                for (var i = 0; i < breaks.length-1; i++) {
+            
+                    var color = getColor(breaks[i + 1], breaks); //a for loop is used to loop through the classes and shortened by one
+                    
+                    legend.append(
+                        '<span style="background:' + color + '"></span> ' +
+                        '<label>'+breaks[i] + ' &ndash; ' + 
+                        breaks[i + 1] + '</label>'); //changes the legend to add the color that is retrieved from the class breaks and adds the highest and smallest number in the class break
+                }
+            legend.append("</ul>");
+            
+        }
+        
+        function createSliderUI() { //function creates the slider
+            
+            var sliderControl = L.control({position: 'bottomleft'}); //creates and places the slider in the bottomleft corner
+            
+            sliderControl.onAdd = function(map) {
+                
+                var slider = L.DomUtil.get('ui-controls'); //retrieves the rules for the slider from the div element
+                
+                L.DomEvent.addListener(slider, 'mousedown', function(e) {
+                    L.DomEvent.stopPropagation(e);
+                }); //DomEvent creates a listening for when the mouse clicks and moves the slider it will change the attribute. 
+                
+                return slider //returns the slider to the listening event
+            }
+            
+            sliderControl.addTo(map); //adds the slider controls to the map 
+            
+            $('.year-slider')
+                .on('input change', function() {
+                    attribute = $(this).val();
+                    updateMap();
+            }); //upon a change in the year of the slider from the event listener, it will take that new number, put it into the attribute variable and update the map
+        }
+        
+        function drawInfo() { //creates the info box
+            
+            var info = L.control({position: 'bottomright'}); //creates and places the info box places it into the bottom right corner
+            
+            info.onAdd = function(map) {
+                
+                var div = L.DomUtil.create('div', 'info'); 
+                
+                return div; //creates the div element for the info box and gives it a class if info
+                
+            }
+            info.addTo(map); //adds to info box to the map
+            $(".info").hide(); //hides the info box after creation
+        }
+        
+        function updateInfo(layer) { //updates the info box's information
+            
+            var props = layer.feature.properties; //creates variable to shorten up the code
+            
+            var html =  "<h3>" + props.County + " county</h3>"+ "<br>" +
+                        "2005: "+ props[2005]+ "<br>" +
+                        "2006: "+ props[2006]+ "<br>" +
+                        "2007: "+ props[2007]+ "<br>" +
+                        "2008: "+ props[2008]+ "<br>" +
+                        "2009: "+ props[2009]+ "<br>" +
+                        "2010: "+ props[2010]+ "<br>" +
+                        "2011: "+ props[2011]+ "<br>" +
+                        "2012: "+ props[2012]+ "<br>" +
+                        "2013: "+ props[2013]+ "<br>" //all of the year's unemployment rate for each county when highlighted
+            
+            $(".info").html(html); 
+        }
+        
+        function highlight(layer) { //creates the highlight function
+            layer.setStyle({
+                weight: 4,
+                color: '#ff0000'
+            }); //when mouse hovers over a county, the new style is an outline color of red
+        }
+        
+        function resetHighlight(layer) { //creates the function to reset the highlight
+            layer.setStyle({
+                color: '#000',
+                weight: 1,
+                fillOpacity: 1
+            }); //when the mouse leaves a county, the outline color is reset to all other county's outline color, black
+        }
+    </script>
+    
+</body>
+
+</html>
