@@ -1,7 +1,7 @@
  <html>
  <head>
      <meta charset="utf-8">
-     <title>University of Kentucky Crime Stats</title>
+     <title>University of Kentucky's Reported Crimes</title>
      
      <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
      <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
@@ -142,10 +142,12 @@
  <body>
      
      <div id="side-panel">
-     <h1>Reported Crimes at the University of Kentucky</h1>
-     <h2>2013 to 2016 Analysis of Crime Across the University of Kentucky</h2>
-     <p>This map is a study of all reported criminal offenses that occurred on the University of Kentucky's campus.  The map will also convert to a heat map by selecting the button in the upper right hand corner. Simply click again to turn off the heat map.</p> 
-     <p>This map was authored by Logan Steele for MAP 673. This map was created on June 12, 2016. The data for this map was gathered from an open source that is available to the public found at <a href="http://www.uky.edu/crimelog/">University of Kentucky's Police Department Crime Log</a>. </p>
+     <h1>University of Kentucky's Reported Crimes</h1>
+     <h2>2013 to 2016 Analysis of Thefts across the University of Kentucky</h2>
+     <p>This map is a study of all reported criminal offenses that occurred on the University of Kentucky's campus. Enter the crime you would like to see within the prompt. The data you enter must be exact with capital first letter. The map will also convert to a heat map by selecting the button in the upper right hand corner. Simply click again to turn off the heat map.</p> 
+     <p>When you hover over the point of a crime, a popup will appear which will tell you the offense and the date. Within the most common offense, Theft, you will see "TBUT" which means "Theft By Unlawful Taking." You will also see an "M", "F", or "V" after all offenses, which stand for "Misdemeanor", "Felony", or "Violation", respectively.</p>
+     <p>This map was created on June 5, 2016. The data for this map was gathered from an open source that is available to the public found at <a href="http://www.uky.edu/crimelog/">University of Kentucky's Police Department Crime Log</a>. </p>
+     <p>This map was authored by Logan Steele for MAP 673.</p>
      
      </div>
      
@@ -188,7 +190,7 @@
          attribute = '1',
          tempRemoved = L.layerGroup();
      
-     var offense = String(prompt("Theft, Robbery, Drug Violations, Alcohol Intoxication, Criminal Mischief, DUI, Harassment, Burglary, Assault, All Other Offenses", "Enter the offense you would like to see"));
+     var offense = String(prompt("Theft, Alcohol Intoxication, Drug Violations, Criminal Mischief, Assault, Robbery, DUI, Harassment, Burglary, All Other Offenses", "Enter the offense you would like to see"));
      
      
      $.getJSON('https://lsteele.cartodb.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM crimes2_1', function(data) {
@@ -258,7 +260,7 @@
          });
          point.eachLayer(function(layer) {
              
-             if (String(layer.feature.properties.month) !== attribute) {
+             if (String(layer.feature.properties.month) !== String(attribute)) {
                  tempRemoved.addLayer(layer);
                  map.removeLayer(layer);
              }
