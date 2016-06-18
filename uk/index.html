@@ -92,6 +92,7 @@
              width: 33%;
              background: #C3E0F8;
              border-right: 2px solid #071D70;
+             overflow-y: scroll;
          }
          h1 {
              padding: 8px 25px 8px 15px;
@@ -185,12 +186,23 @@
          }).addTo(map);
      
      var point,
+         offense,
          min = 1,
          max = 17,
          attribute = '1',
          tempRemoved = L.layerGroup();
      
-     var offense = String(prompt("Theft, Alcohol Intoxication, Drug Violations, Criminal Mischief, Assault, Robbery, DUI, Harassment, Burglary, All Other Offenses", "Enter the offense you would like to see"));
+     var offense = String(prompt("Theft, Alcohol Intoxication, Drug Violations, Criminal Mischief, Assault, Robbery, DUI, Harassment, Burglary, All Other Offenses", "Enter the offense you would like to see"))
+     
+     try{
+         if(offense != "Theft", "Alcohol Intoxication", "Drug Violations", "Criminal Mischief", "Assault", "Robbery", "DUI", "Harassment", "Burglary", "All Other Offenses")
+        throw "Err"
+     }
+     catch(er){
+         if(er=="Err")
+             alert ("Error! Improper Text. Refresh Page and Re-enter the Offense")
+     }
+
      
      
      $.getJSON('https://lsteele.cartodb.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM crimes2_1', function(data) {
