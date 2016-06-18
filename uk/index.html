@@ -16,6 +16,8 @@
      <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
  
      <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+     <script src='http://jawj.github.com/OverlappingMarkerSpiderfier-Leaflet/bin/oms.min.js'></script>
+     <script src="oms.min.js"></script>
      <style>
          body {
              padding: 0;
@@ -41,7 +43,7 @@
              border-radius: 3px;
              padding: 8px 15px;
              color: whitesmoke;
-             font-size: 1em;
+             font-size: .8em;
          }
           #info p {
              margin: 3px 0 4px;
@@ -50,10 +52,12 @@
              width: 100%;
          }
          #ui-controls .min {
-             float: left;   
+             float: left;
+             padding: 5px;
          }
          #ui-controls .max {
              float: right;
+             padding: 5px;
          }
          #ui-controls {
              width: 600px;
@@ -109,14 +113,14 @@
              color: black;
              font-weight: 500;
              font-size: 1.2em;
-             text-align: center;
+             text-align: left;
          }
          #side-panel p {
              margin: 8px 0 4px;
              padding: 0 25px 0 15px;
              color: #3d3d3d;
              text-align: left;
-             font-size: 1em;
+             font-size: .8em;
          }
          #side-panel p:after {
              content: '';
@@ -138,17 +142,20 @@
          .leaflet-control-layers-group-name{
              font-weight: bold;
          }
+         #side-panel text {
+             font-size: 0.5em;
+         }
      </style>
  </head>
  <body>
      
      <div id="side-panel">
-     <h1>University of Kentucky's Reported CrimesTest</h1>
+     <h1>University of Kentucky's Reported Crimes</h1>
      <h2>2013 to 2016 Analysis of Thefts across the University of Kentucky</h2>
      <p>This map is a study of all reported criminal offenses that occurred on the University of Kentucky's campus. Enter the crime you would like to see within the prompt. The data you enter must be exact with capital first letter. The map will also convert to a heat map by selecting the button in the upper right hand corner. Simply click again to turn off the heat map.</p> 
      <p>When you hover over the point of a crime, a popup will appear which will tell you the offense and the date. Within the most common offense, Theft, you will see "TBUT" which means "Theft By Unlawful Taking." You will also see an "M", "F", or "V" after all offenses, which stand for "Misdemeanor", "Felony", or "Violation", respectively.</p>
      <p>This map was created on June 5, 2016. The data for this map was gathered from an open source that is available to the public found at <a href="http://www.uky.edu/crimelog/">University of Kentucky's Police Department Crime Log</a>. </p>
-     <p>This map was authored by Logan Steele for MAP 673.</p>
+     <p>This map was authored by Logan Steele for MAP 673. You can see all the data at <a href="https://github.com/ltst226/ltst226.github.io"> Logan's GitHub Page</a></p>
      
      </div>
      
@@ -185,12 +192,26 @@
  	           ext: 'png'
          }).addTo(map);
      
+     var style = {
+             color: 'red',
+             weight: 1,
+             fillOpacity: 1,
+             fillColor: '#6E84D6',
+             radius: 7
+         }
+     var firstIcon = L.Icon.Default;
+     var secondIcon = L.Icon.Default;
+     
      var point,
          offense,
          min = 1,
          max = 17,
          attribute = '1',
          tempRemoved = L.layerGroup();
+     
+     var oms = new OverlappingMarkerSpiderfier(map, {
+         circleSpiralSwitchover: 0
+     });
      
      var offense = String(prompt("Theft, Alcohol Intoxication, Drug Violations, Criminal Mischief, Assault, Robbery, DUI, Harassment, Burglary, All Other Offenses", "Enter the offense you would like to see"))
      
@@ -210,19 +231,46 @@
  
          point = L.geoJson(data, {
              pointToLayer: function(feature, latlng) {
-                 return L.circleMarker(latlng, {
-                     color: 'red',
-                     weight: 1,
-                     fillOpacity: 1,
-                     fillColor: '#6E84D6',
-                     radius: 7
-                 })
+                 return L.circleMarker(latlng, style)
              },
              filter: function(feature){
                  if(feature.properties.category === offense){
                     return feature;
                  }
              }
+         });
+         
+        var popup = new L.Popup();
+                 oms.addListener('click', function(marker) {
+                 popup.setContent(marker.desc);
+                 popup.setLatLng(marker.getLatLng());
+                 map.openPopup(popup);
+             });
+
+             oms.addListener('spiderfy', function(marker) {
+                 map.closePopup();
+             });
+
+             for (var i = 0; i < point.length; i++) {
+                 var datum = window.data[i];
+                 var loc = new L.LatLng(datum.lat, datum.lon);
+                 marker.desc = datum.d;
+                 map.addLayer(marker);
+                 oms.addMarker(marker);
+             }
+         
+         var popup = new L.Popup({closeButton: false, offset: new L.Point(0.5, -24)});
+         oms.addListener('click', function(marker){
+             popup.setContent(marker.desc);
+             popup.setLatLng(marker.getLatLng());
+             map.openPopup(popup);
+         });
+         oms.addListener('spiderfy', function(markers) {
+             for (var i = 0, len = markers.length; i < len; i++) markers[i].setIcon(new firstIcon());
+             map.closePopup();
+         });
+         oms.addListener('unspiderfy', function(markers) {
+             for ( var i = 0, len = markers.length; i < len; i ++) markers[i].setIcon(new secondIcon());
          });
          
          heatLayer = L.heatLayer([0,0], {maxZoom: 18}).addTo(map);
