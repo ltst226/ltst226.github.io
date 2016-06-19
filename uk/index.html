@@ -212,19 +212,10 @@
      var oms = new OverlappingMarkerSpiderfier(map, {
          circleSpiralSwitchover: 0
      });
-     
+     do {
      var offense = String(prompt("Theft, Alcohol Intoxication, Drug Violations, Criminal Mischief, Assault, Robbery, DUI, Harassment, Burglary, All Other Offenses", "Enter the offense you would like to see"))
      
-     try{
-         if(offense != "Theft", "Alcohol Intoxication", "Drug Violations", "Criminal Mischief", "Assault", "Robbery", "DUI", "Harassment", "Burglary", "All Other Offenses")
-        throw "Err"
-     }
-     catch(er){
-         if(er=="Err")
-             alert ("Error! Improper Text. Refresh Page and Re-enter the Offense")
-     }
-
-     
+     }while(offense != "Theft" && offense != "Alcohol Intoxication" && offense != "Drug Violations" && offense != "Criminal Mischief" && offense != "Assault" && offense != "Robbery" && offense != "DUI" && offense != "Harassment" && offense != "Burglary" && offense != "All Other Offenses")
      
      $.getJSON('https://lsteele.cartodb.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM crimes2_1', function(data) {
          
