@@ -209,9 +209,9 @@
          attribute = '1',
          tempRemoved = L.layerGroup();
      
-     var oms = new OverlappingMarkerSpiderfier(map, {
+    /* var oms = new OverlappingMarkerSpiderfier(map, {
          circleSpiralSwitchover: 0
-     });
+     });*/
      do {
      var offense = String(prompt("Theft, Alcohol Intoxication, Drug Violations, Criminal Mischief, Assault, Robbery, DUI, Harassment, Burglary, All Other Offenses", "Enter the offense you would like to see"))
      
@@ -231,7 +231,7 @@
              }
          });
          
-        var popup = new L.Popup();
+/*        var popup = new L.Popup();
                  oms.addListener('click', function(marker) {
                  popup.setContent(marker.desc);
                  popup.setLatLng(marker.getLatLng());
@@ -262,7 +262,7 @@
          });
          oms.addListener('unspiderfy', function(markers) {
              for ( var i = 0, len = markers.length; i < len; i ++) markers[i].setIcon(new secondIcon());
-         });
+         });*/
          
          heatLayer = L.heatLayer([0,0], {maxZoom: 18}).addTo(map);
          
@@ -399,6 +399,7 @@
          
          heatLayer.redraw(); 
      }
+     
         
  </script>
  </body>
